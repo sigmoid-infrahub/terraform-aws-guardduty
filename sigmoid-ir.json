@@ -1,0 +1,116 @@
+{
+    "resourceSpecId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
+    "stableId": "guardduty-config",
+    "displayName": "GuardDuty Configuration",
+    "resourceType": "security.guardduty",
+    "vpcDependency": "none",
+    "status": "draft",
+    "inputs": {
+        "enable": true,
+        "finding_publishing_frequency": "FIFTEEN_MINUTES",
+        "datasources": {
+            "s3_logs": {
+                "enable": true
+            },
+            "kubernetes": {
+                "audit_logs": {
+                    "enable": true
+                }
+            },
+            "malware_protection": {
+                "scan_ec2_instance_with_findings": {
+                    "ebs_volumes": {
+                        "enable": true
+                    }
+                }
+            }
+        },
+        "runtime_monitoring": {
+            "ecs_fargate": {
+                "enable": true
+            },
+            "ec2": {
+                "enable": true
+            },
+            "eks": {
+                "addon_management": {
+                    "enable": true
+                }
+            }
+        },
+        "publishing_destination": {
+            "destination_arn": { "ref": "guardduty-findings-bucket.arn" },
+            "kms_key_arn": { "ref": "kms-key.arn" }
+        },
+        "filter_criteria": [
+            {
+                "name": "HighSeverityFindings",
+                "description": "Filter for high severity findings",
+                "action": "NOOP",
+                "rank": 1,
+                "finding_criteria": {
+                    "criterion": {
+                        "severity": {
+                            "greater_than_or_equal": 7
+                        }
+                    }
+                }
+            },
+            {
+                "name": "SuppressDevelopmentFindings",
+                "description": "Archive low severity findings from development resources",
+                "action": "ARCHIVE",
+                "rank": 2,
+                "finding_criteria": {
+                    "criterion": {
+                        "severity": {
+                            "less_than": 4
+                        },
+                        "resource.tags.Environment": {
+                            "equals": ["development"]
+                        }
+                    }
+                }
+            }
+        ],
+        "ipset": {
+            "activate": true,
+            "format": "TXT",
+            "location": { "ref": "trusted-ips-s3.uri" },
+            "name": "TrustedIPList"
+        },
+        "threatintelset": {
+            "activate": true,
+            "format": "TXT",
+            "location": { "ref": "threat-intel-s3.uri" },
+            "name": "CustomThreatIntel"
+        },
+        "auto_enable_organization_members": "ALL",
+        "tags": {
+            "Environment": "production",
+            "Project": "sigmoid",
+            "SecurityTool": "guardduty"
+        }
+    },
+    "inputSpecs": [
+        { "name": "enable", "type": "boolean", "required": true, "default": true },
+        { "name": "finding_publishing_frequency", "type": "string", "required": false, "default": "SIX_HOURS" },
+        { "name": "datasources", "type": "object", "required": false },
+        { "name": "s3_logs", "type": "object", "required": false },
+        { "name": "kubernetes", "type": "object", "required": false },
+        { "name": "malware_protection", "type": "object", "required": false },
+        { "name": "runtime_monitoring", "type": "object", "required": false },
+        { "name": "publishing_destination", "type": "object", "required": false },
+        { "name": "filter_criteria", "type": "array", "required": false },
+        { "name": "ipset", "type": "object", "required": false },
+        { "name": "threatintelset", "type": "object", "required": false },
+        { "name": "auto_enable_organization_members", "type": "string", "required": false },
+        { "name": "tags", "type": "object", "required": false }
+    ],
+    "position": { "x": 800, "y": 150 },
+    "terraform": {
+        "module": {
+            "source": "../../terraform-modules/terraform-aws-guardduty"
+        }
+    }
+}
