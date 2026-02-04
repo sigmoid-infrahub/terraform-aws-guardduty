@@ -2,6 +2,8 @@
     "resourceSpecId": "bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb",
     "stableId": "guardduty-config",
     "displayName": "GuardDuty Configuration",
+    "category": "security",
+    "iconUrl": "https://cdn.sigmoid.us/icons/aws/full-size/svg/security/guardduty.svg",
     "resourceType": "security.guardduty",
     "vpcDependency": "none",
     "status": "draft",
