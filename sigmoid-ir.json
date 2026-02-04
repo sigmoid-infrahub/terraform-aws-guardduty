@@ -112,7 +112,8 @@
     "position": { "x": 800, "y": 150 },
     "terraform": {
         "module": {
-            "source": "../../terraform-modules/terraform-aws-guardduty"
+            "source": "github.com/sigmoid-hq/terraform-aws-guardduty",
+            "ref": "main"
         }
     }
 }
